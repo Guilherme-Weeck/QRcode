@@ -44,7 +44,7 @@
                 alert("Por favor, insira um texto ou URL!");
                 return;
             }
-            var url = "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + encodeURIComponent(text);
+            var url = "https://quickchart.io/qr?text=" + encodeURIComponent(text);
             document.getElementById("qr-code").innerHTML = '<img src="' + url + '" alt="QR Code">';
         }
     </script>
