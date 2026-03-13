@@ -44,13 +44,38 @@ body{
 <div id="qrcode"></div>
 
 <script>
+
+function getParametro(nome){
+    const params = new URLSearchParams(window.location.search);
+    return params.get(nome);
+}
+
+window.onload = function(){
+
+    let textoURL = getParametro("texto");
+    let tamanhoURL = getParametro("tamanho");
+
+    if(tamanhoURL){
+        document.getElementById("tamanho").value = tamanhoURL;
+    }
+
+    if(textoURL){
+        document.getElementById("texto").value = textoURL;
+    }
+
+    if(textoURL || tamanhoURL){
+        gerarQR();
+    }
+
+}
+    
 function gerarQR(){
 
     let div = document.getElementById("qrcode");
     div.innerHTML = "";
 
     let texto = document.getElementById("texto").value;
-    let tamanho = parseInt(document.getElementById("tamanho").value);
+    let tamanho = parseInt(document.getElementById("tamanho").value) || 200;
 
     new QRCode(div, {
         text: texto,
