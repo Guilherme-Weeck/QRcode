@@ -28,13 +28,75 @@ body{
 
 <h1>Gerador de QR Code</h1>
 <p>Digite o texto ou URL que você deseja transformar em QR Code:</p>
+
+<div id="campo_texto">
+<label>Texto:</label>
 <input type="text" id="texto" placeholder="Digite algo">
+</div>
+
+<div id="campo_wifi" style="display:none">
+
+<label>SSID</label>
+<input id="wifi_ssid" type="text">
+
+<label>Senha</label>
+<input id="wifi_pass" type="text">
+
+<label>Segurança</label>
+<select id="wifi_tipo">
+<option value="WPA">WPA/WPA2</option>
+<option value="WEP">WEP</option>
+<option value="nopass">Sem senha</option>
+</select>
+
+</div>
+
+<div id="campo_tel" style="display:none">
+<label>Telefone</label>
+<input id="telefone" type="text">
+</div>
+
+<div id="campo_vcard" style="display:none">
+
+<label>Nome</label>
+<input id="v_nome" type="text">
+
+<label>Empresa</label>
+<input id="v_empresa" type="text">
+
+<label>Telefone</label>
+<input id="v_tel" type="text">
+
+<label>Email</label>
+<input id="v_email" type="text">
+
+</div>
+
+<div id="campo_email" style="display:none">
+<label>Email</label>
+<input id="email" type="text">
+</div>
+
+<div id="campo_url" style="display:none">
+<label>URL</label>
+<input id="url" type="text">
+</div>
 
 <select id="tamanho">
     <option value="150">150 px</option>
     <option value="200" selected>200 px</option>
     <option value="300">300 px</option>
     <option value="400">400 px</option>
+</select>
+
+<label>Tipo:</label>
+<select id="tipo" onchange="atualizarCampos()">
+<option value="texto" selected>Texto</option>
+<option value="wifi">WiFi</option>
+<option value="tel">Telefone</option>
+<option value="vcard">Contato (vCard)</option>
+<option value="email">Email</option>
+<option value="url">URL</option>
 </select>
 
 <button onclick="gerarQR()">Gerar QRCode</button>
@@ -44,6 +106,70 @@ body{
 <div id="qrcode"></div>
 
 <script>
+
+function atualizarCampos(){
+
+    let tipo = document.getElementById("tipo").value;
+
+    document.getElementById("campo_texto").style.display = "none";
+    document.getElementById("campo_wifi").style.display = "none";
+    document.getElementById("campo_tel").style.display = "none";
+    document.getElementById("campo_email").style.display = "none";
+    document.getElementById("campo_url").style.display = "none";
+    document.getElementById("campo_vcard").style.display = "none";
+
+    document.getElementById("campo_" + tipo).style.display = "block";
+
+}
+
+function obterTextoQR(){
+
+    let tipo = document.getElementById("tipo").value;
+
+    if(tipo == "texto"){
+        return document.getElementById("texto").value;
+    }
+
+    if(tipo == "wifi"){
+
+        let ssid = document.getElementById("wifi_ssid").value;
+        let pass = document.getElementById("wifi_pass").value;
+        let sec = document.getElementById("wifi_tipo").value;
+
+        return `WIFI:T:${sec};S:${ssid};P:${pass};;`;
+    }
+
+    if(tipo == "tel"){
+        let tel = document.getElementById("telefone").value;
+        return `tel:${tel}`;
+    }
+
+    if(tipo == "vcard"){
+
+    let nome = document.getElementById("v_nome").value;
+    let empresa = document.getElementById("v_empresa").value;
+    let tel = document.getElementById("v_tel").value;
+    let email = document.getElementById("v_email").value;
+
+    return "BEGIN:VCARD\n"
+    + "VERSION:3.0\n"
+    + "FN:" + nome + "\n"
+    + "ORG:" + empresa + "\n"
+    + "TEL;TYPE=CELL:" + tel + "\n"
+    + "EMAIL:" + email + "\n"
+    + "END:VCARD";
+    }
+
+    if(tipo == "email"){
+        let email = document.getElementById("email").value;
+        return `mailto:${email}`;
+    }
+
+    if(tipo == "url"){
+        return document.getElementById("url").value;
+    }
+
+}
 
 function getParametro(nome){
     const params = new URLSearchParams(window.location.search);
@@ -74,7 +200,7 @@ function gerarQR(){
     let div = document.getElementById("qrcode");
     div.innerHTML = "";
 
-    let texto = document.getElementById("texto").value;
+    let texto = obterTextoQR();
     let tamanho = parseInt(document.getElementById("tamanho").value) || 200;
 
     new QRCode(div, {
